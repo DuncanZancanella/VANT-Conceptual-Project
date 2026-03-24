@@ -1,6 +1,7 @@
 clc
 kmh_to_fts = 0.9113446583067 ;
 kg_to_lb = 2.2046226218      ;
+km_to_ft = 3280.84;
 % --- Calculo MTOW da Missão 2 - Alijamento
 
 Wdrop = 150 * kg_to_lb
@@ -22,10 +23,11 @@ M = v/a              ;
 W2W1 = 1.0065 - 0.325*M
 
 % Cruzeiro
-C = 0.4/3600      ; % Consumo especifico (lb/s)
-E = 500/150*3600  ; % Endurance (s)
-LDmax = 12        ;
-W3W2 = exp(- E*C / LDmax)
+C = 0.4/3600        ; % Consumo especifico (lb/s)
+R = 500*km_to_ft  ; % Range (ft)
+V = 150*kmh_to_fts; % Velocidade (ft/s)
+LDmax = 12          ;
+W3W2 = exp(-R*C / (V*LDmax) )
 W5W4 = W3W2
 
 % Descida
