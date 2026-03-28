@@ -55,7 +55,8 @@ c = -0.16;
 Wpl = CP_lb;
 
 % -- Peso Vazio
-%We =  A*(W0^c)*W0;
+Kvs = 1
+WeW0 = @(W0)  A*(W0^c) * Kvs;
 
 % -- Peso Combustível
 
@@ -80,12 +81,12 @@ W6W5 = 0.995
 WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 
 % --- Resolvendo W0
-R = @(W0) W0 - (Wpl + WfW0*W0 + A*(W0^c)*W0) ;
+R = @(W0) W0 - (Wpl + WfW0*W0 + We(W0)) ;
 W0 = fzero(R, 200)
 
-
+We = WeW0(W0)*W0
 Wf = WfW0*W0
-We = A*(W0^c)*W0
+
 
 
 
