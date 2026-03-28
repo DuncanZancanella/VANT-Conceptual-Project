@@ -1,3 +1,7 @@
+clc
+kmh_to_fts = 0.9113446583067 ;
+kg_to_lb = 2.2046226218      ;
+km_to_ft = 3280.84;
 
 % --- Calculo MTOW da Missão 1 ---
 
@@ -11,22 +15,23 @@
 
 % -- Pré-requisitos:
 CP_kg = 5;
-CP_lb = CP_kg * 2.2046 ;
+CP_lb = CP_kg * kg_to_lb ;
 R_km = 500; % Alcance no cruzeiro
-R_ft = R_km * 3281;
+R_ft = R_km * km_to_ft;
 Vc_kmh = 250; % Velocidade de cruzeiro
-Vc_fts = Vc_kmh/ 1.097;
+Vc_fts = Vc_kmh * kmh_to_fts;
 E_h = 2; % Tempo de Loiter
-E_s = E_h*3600; %
+E_s = E_h * 3600; %
 
 h_m = 1000; % altitude de decolagem
 l_pista = 150; % comprimento da pista
 h_s = 2000; % teto de serviço
 
-V_sound_kmh = 1204;
-V_sound_fts = V_sound_kmh/ 1.097;
+v = Vc_kmh/3.6   ; % Velocidade (m/s)
+T = 275.1            ; % Temperatura do ar (K)
+a = sqrt(1.4*T*287)  ;
+M = v/a              ;
 
-M = Vc_fts/V_sound_fts
 
 
 % -- Estimativa da aeronave:
@@ -55,30 +60,32 @@ Wpl = CP_lb;
 % -- Peso Combustível
 
 % W1/W0
-W1W0 = 0.970;
+W1W0 = 0.970
 
 % W2/W1
-W2W1 = 1.0065 - 0.0325*M;
+W2W1 = 1.0065 - 0.0325*M
 
 % W3/W2
-arg_exp_c = (R_ft*C_c_s/(Vc_fts*LD_c));
-W3W2 = exp(-arg_exp_c);
+W3W2 = exp(-R_ft*C_c_s/(Vc_fts*LD_c))
 
 % W4/W3
-arg_exp_l = (-E_s*C_l_s/(LD_l));
-W4W3 = exp(arg_exp_l);
+W4W3 = exp(-E_s*C_l_s/(LD_l))
 
 % W5/W4
-W5W4 = W3W2;
+W5W4 = W3W2
 
 % W6/W5
-W6W5 = 0.995;
+W6W5 = 0.995
 
 WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 
 % --- Resolvendo W0
 R = @(W0) W0 - (Wpl + WfW0*W0 + A*(W0^c)*W0) ;
 W0 = fzero(R, 200)
+
+
+Wf = WfW0*W0
+We = A*(W0^c)*W0
 
 
 
