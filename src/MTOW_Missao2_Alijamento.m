@@ -20,7 +20,7 @@ v = 150/3.6   ; % Velocidade (m/s)
 T = 275.1            ; % Temperatura do ar (K)
 a = sqrt(1.4*T*287)  ;
 M = v/a              ;
-W2W1 = 1.0065 - 0.325*M
+W2W1 = 0.985 %1.0065 - 0.0325*M
 
 % Cruzeiro
 C = 0.4/3600        ; % Consumo especifico (lb/s)
