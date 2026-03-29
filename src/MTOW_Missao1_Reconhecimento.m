@@ -20,7 +20,7 @@ R_km = 500; % Alcance no cruzeiro
 R_ft = R_km * km_to_ft;
 Vc_kmh = 250; % Velocidade de cruzeiro
 Vc_fts = Vc_kmh * kmh_to_fts;
-E_h = 2; % Tempo de Loiter
+E_h = 4; % Tempo de Loiter
 E_s = E_h * 3600; %
 
 h_m = 1000; % altitude de decolagem
