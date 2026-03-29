@@ -56,8 +56,8 @@ Wpl = CP_lb;
 
 % -- Peso Vazio
 Kvs = 1
-WeW0 = @(W0)  A*(W0^c) * Kvs;
-
+WeW0 = %@(W0)  A*(W0^c) * Kvs;
+We = % valor código missão 2
 % -- Peso Combustível
 
 % W1/W0
@@ -81,12 +81,24 @@ W6W5 = 0.995
 WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 
 % --- Resolvendo W0
-R = @(W0) W0 - (Wpl + WfW0*W0 + WeW0(W0)*W0) ;
+R = @(W0) W0 - (Wpl + WfW0*W0 + We) ;
 W0 = fzero(R, 200)
 
-We = WeW0(W0)*W0
 Wf = WfW0*W0
 
 
+Wf = WfW0*W0
+W1 = W1W0*W0
+W2 = W2W1*W1
+W3 = W3W2*W2
+W4 = W4W3*W3
+W5 = W5W4*W4
+W6 = W6W5*W5
+Wf/W0
+
+x = [0,1,2,3,4,5,6];
+plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o')
+title('Evolução do Peso na Missão')
+grid('on')
 
 
