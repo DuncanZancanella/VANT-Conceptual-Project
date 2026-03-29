@@ -1,35 +1,40 @@
 
 % --- Estimativa de Razão de subida
-
-% - Seguindo a equação 5.122 do Anderson - Aircraft Performance and Design
 clc;
 close all;
 
+% - Seguindo a equação 5.122 do Anderson - Aircraft Performance and Design
+
 RCmax = @(eta_prop, P, W0, S, wing_eff, LD_max, q_inf, K, CD0) eta_prop*(P/W0) - (2/q_inf)*sqrt(K/(3*CD0)*(W0/S))*1.155/LDmax
-%RCmax = @(eta_prop, P_W, W0_kg, S_m2, rho_inf, CD0, LDmax) (eta_prop*P_W/W0_kg) - 0.8776*sqrt( (W0_kg/S_m2)/(rho_inf*CD0) )/(LDmax^(3/2) )
 
+% - Assumindo características geométricas/aerodinâmicas similares ao TAI Anka-S
 eta_prop = 0.87;
-hp_to_W = 745.7;
-
-P_hp = 155;
-P_W = P_hp*hp_to_W;
-
-W0_N = 800*9.81;
-Sref_m2 = 13.6;
-
 wing_eff = 0.9;
 
-LDmax = 12;
+hp_to_W = 745.7;
+P_hp = 100;       % - Motor similar ao Bayraktar TB2
+P_W = P_hp*hp_to_W;
 
-rho = 1.1117;
-v_inf_mps = 250/3.6;
+W0_N = [500*9.81, 800*9.81]; % - Peso máximo da missão 1 e 2
+Sref_m2 = 13.6; % - área similar ao TAI Anka-S
+
+LDmax = 18;
+
+rho = 1.1117;   % - Densidade do ar em altitude de 1000m, utilizando modelo de atmosfera padrão
+v_inf_mps = 250/3.6;  % - Velocidade de cruzeiro [m/s]
 q_inf = 0.5*rho*v_inf_mps^2;
 
-AR = 8;
+AR = 14;
 K = 1/(pi*wing_eff*AR);
 
-CD0 = 0.03;
+CD0 = 0.03;   % - Arrasto parasita aproximado
 
-RC_max = RCmax(eta_prop, P_W, W0_N, Sref_m2, wing_eff, LD_max, q_inf, K, CD0)
-%RC_max = RCmax(eta_prop, P_W, W0_kg, Sref_m2, q_inf, CD0, LDmax)
+fprintf(' ---- Cáculo de taxa de subida ---- \n')
+for i = 1:length(W0_N)
+  W_N = W0_N(i);
+
+  RC_max = RCmax(eta_prop, P_W, W_N, Sref_m2, wing_eff, LDmax, q_inf, K, CD0);
+  fprintf('Missão %d | W0: %d N | RC_max: %.2f m/s \n', ...
+            i, W0_N(i), RC_max);
+end
 
