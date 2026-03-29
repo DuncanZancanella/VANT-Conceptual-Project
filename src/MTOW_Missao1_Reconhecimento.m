@@ -98,7 +98,7 @@ Wf/W0
 
 x = [0,1,2,3,4,5,6];
 plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o')
-title('Evolução do Peso na Missão')
+title('Evolução do Peso na Missão 1')
 grid('on')
 
 
