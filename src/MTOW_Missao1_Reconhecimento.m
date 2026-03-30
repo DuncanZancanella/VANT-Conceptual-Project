@@ -1,4 +1,5 @@
 clc
+close all;
 kmh_to_fts = 0.9113446583067 ;
 kg_to_lb = 2.2046226218      ;
 km_to_ft = 3280.84;
@@ -96,13 +97,13 @@ W6 = W6W5*W5
 Wf/W0
 
 x = [0,1,2,3,4,5,6];
-plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o')
+plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o',  'LineWidth', 3)
 grid('on')
-title('Evolução do Peso na Missão 1')
-xlabel('Etapa')
-ylabel('Peso (lb)')
 
-
+title('Evolução do Peso na Missão 1', 'FontSize', 20)
+xlabel('Etapa', 'FontSize', 20)
+ylabel('Peso (lb)', 'FontSize', 20)
+set(gca, 'FontSize', 20)  % controla os números dos eixos (ticks)
 
 
 

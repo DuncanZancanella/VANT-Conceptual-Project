@@ -38,7 +38,7 @@ W2W1 = 0.985
 C = 0.4/3600        ; % Consumo especifico (lb/s)
 R = 500*km_to_ft    ; % Range (ft)
 V = 150*kmh_to_fts  ; % Velocidade (ft/s)
-LDmax = 12          ;
+LDmax = 18         ;
 W3W2 = exp(-R*C / (V*LDmax) )
 W6W5 = W3W2
 
@@ -63,4 +63,23 @@ WfW0 = Wf(W0)/W0
 Wf = Wf(W0)
 We = WeW0(W0)*W0
 
+% --- plot
+Wf = WfW0*W0
+W1 = W1W0 * W0;
+W2 = W2W1 * W1;
+W3 = W3W2 * W2;
+W4 = W4W3 * W3;
+W5 = W4 - Wdrop;
+W6 = W6W5 * W5;
+W7 = W7W6 * W6
+
+x = [0,1,2,3,4,5,6, 7];
+plot(x,[W0,W1,W2,W3,W4_val,W5_val,W6,W7], 'b--o', 'LineWidth', 3)
+grid('on')
+
+title('Evolução do Peso na Missão 2', 'FontSize', 20)
+xlabel('Etapa', 'FontSize', 20)
+ylabel('Peso (lb)', 'FontSize', 20)
+
+set(gca, 'FontSize', 20)  % controla os números dos eixos (ticks)
 
