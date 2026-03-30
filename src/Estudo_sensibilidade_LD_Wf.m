@@ -84,7 +84,7 @@ R_km = 500; % Alcance no cruzeiro
 R_ft = R_km * km_to_ft;
 Vc_kmh = 250; % Velocidade de cruzeiro
 Vc_fts = Vc_kmh * kmh_to_fts;
-E_h = 2; % Tempo de Loiter
+E_h = 4; % Tempo de Loiter
 E_s = E_h * 3600; %
 
 h_m = 1000; % altitude de decolagem
@@ -93,8 +93,8 @@ h_s = 2000; % teto de serviço
 
 v = Vc_kmh/3.6   ; % Velocidade (m/s)
 T = 275.1            ; % Temperatura do ar (K)
-a_som = sqrt(1.4*T*287)  ;
-M = v/a_som        ;
+a_som_mps = sqrt(1.4*T*287)  ;
+M = v/a_som_mps              ;
 
 
 % -- Estimativa da aeronave:
@@ -102,10 +102,8 @@ M = v/a_som        ;
 for i = 1:n
   AR_wet_i = AR_vec(i);
   LD_i_missao1 = a * AR_wet_i.^b;
-
-  Swet_Sref = 5; %Raymer fig 3.6 --> Beech Duchess
-  Areawet = 1.8; %Raymer fig 3.5
-
+  % -- Estimativa da aeronave:
+  Swet_Sref = 3.5;
   LD_max = LD_i_missao1;
   LD_c = LD_max;
   LD_l = 0.866 * LD_max;
@@ -124,37 +122,36 @@ for i = 1:n
   Wpl = CP_lb;
 
   % -- Peso Vazio
-  Kvs = 1;
-  WeW0 = @(W0)  A*(W0^c) * Kvs;
-
+  Kvs = 1
+  %WeW0 = %@(W0)  A*(W0^c) * Kvs;
+  We = 631.95 % valor código missão 2
   % -- Peso Combustível
 
   % W1/W0
-  W1W0 = 0.970;
+  W1W0 = 0.970
 
   % W2/W1
-  W2W1 = 0.985; %1.0065 - 0.0325*M;
+  W2W1 = 0.985 %1.0065 - 0.0325*M
 
   % W3/W2
-  W3W2 = exp(-R_ft*C_c_s/(Vc_fts*LD_c));
+  W3W2 = exp(-R_ft*C_c_s/(Vc_fts*LD_c))
 
   % W4/W3
-  W4W3 = exp(-E_s*C_l_s/(LD_l));
+  W4W3 = exp(-E_s*C_l_s/(LD_l))
 
   % W5/W4
-  W5W4 = W3W2;
+  W5W4 = W3W2
 
   % W6/W5
-  W6W5 = 0.995;
+  W6W5 = 0.995
 
   WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 
   % --- Resolvendo W0
-  R = @(W0) W0 - (Wpl + WfW0*W0 + WeW0(W0)*W0) ;
-  W0 = fzero(R, 200);
+  R = @(W0) W0 - (Wpl + WfW0*W0 + We) ;
+  W0 = fzero(R, 200)
 
-  We = WeW0(W0)*W0;
-  Wf = WfW0*W0;
+  Wf = WfW0*W0
 
   # --- salvar dados
   Wf_arr_missao1(i)     = Wf;
@@ -172,46 +169,51 @@ for i = 1:n
 
   AR_wet_i = AR_vec(i);
   LD_i = a * AR_wet_i.^b;
-  % Fracao de peso vazio
+ % Fracao de peso vazio
   A = 1.67  ;
   c = -0.16 ;
   Kvs = 1   ;
   WeW0 = @(W0) A * W0^c * Kvs;
 
   % Warmp up e decolagem
-  W1W0 = 0.97;
+  W1W0 = 0.97
 
   % Subida ate Mach M
-  v = 150/3.6   ; % Velocidade (m/s)
+  v = 150/3.6          ; % Velocidade (m/s)
   T = 275.1            ; % Temperatura do ar (K)
-  a_mps = sqrt(1.4*T*287)  ;
-  M = v/a_mps             ;
-  W2W1 = 0.985; %1.0065 - 0.0325*M;
+  a_som = sqrt(1.4*T*287)  ;
+  M = v/a_som            ;
+  W2W1 = 1.0065 - 0.0325*M
+  W2W1 = 0.985
 
   % Cruzeiro
   C = 0.4/3600        ; % Consumo especifico (lb/s)
-  R = 500*km_to_ft  ; % Range (ft)
-  V = 150*kmh_to_fts; % Velocidade (ft/s)
+  R = 500*km_to_ft    ; % Range (ft)
+  V = 150*kmh_to_fts  ; % Velocidade (ft/s)
   LDmax = LD_i         ;
-  W3W2 = exp(-R*C / (V*LDmax) );
-  W5W4 = W3W2;
+  W3W2 = exp(-R*C / (V*LDmax) )
+  W6W5 = W3W2
+
+  % Loiter
+  E = 0.5*3600 ;
+  W4W3 = exp(-E*C/(0.866*LDmax))
 
   % Descida
-  W6W5 = 0.995;
+  W7W6 = 0.995
 
   % Alijamento
-  Wf03 = @(W0) 1.06*(1 - W3W2*W2W1*W1W0)*W0;
-  W3 = @(W0) W0 - Wf03(W0);
-  W4 = @(W0) W3(W0) - Wdrop;
-  Wf46 = @(W0) 1.06*(1 - W5W4*W6W5)*(W4(W0));
-  Wf_function = @(W0) Wf03(W0) + Wf46(W0);
+  Wf04 = @(W0) 1.06*(1 - W4W3*W3W2*W2W1*W1W0)*W0;
+  W4 = @(W0) W0 - Wf04(W0);
+  W5 = @(W0) W4(W0) - Wdrop;
+  Wf57 = @(W0) 1.06*(1 - W7W6*W6W5)*(W5(W0));
+  Wf = @(W0) Wf04(W0) + Wf57(W0);
 
-  g = @(W0) W0 - ( Wdrop + WeW0(W0)*W0 + Wf_function(W0) );
+  g = @(W0) W0 - ( Wdrop + WeW0(W0)*W0 + Wf(W0) );
 
-  W0 = fzero(g, 1000);
-  WfW0 = Wf_function(W0)/W0;
-  Wf = Wf_function(W0);
-  We = WeW0(W0)*W0;
+  W0 = fzero(g, 1000)
+  WfW0 = Wf(W0)/W0
+  Wf = Wf(W0)
+  We = WeW0(W0)*W0
 
   % --- Salvar dados
   AR_wet_arr(i) = AR_wet_i;
@@ -272,5 +274,5 @@ xlabel(ax2, 'AR_{wet}', 'FontSize', 25);
 
 axes(ax1);
 set(gca, 'YTick', 0:25:250);
-set(gca, 'XTick', 8:1:25);
+%set(gca, 'XTick', 8:1:25);
 

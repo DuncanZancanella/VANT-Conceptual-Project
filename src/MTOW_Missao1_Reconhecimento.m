@@ -100,7 +100,7 @@ plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o')
 grid('on')
 title('Evolução do Peso na Missão 1')
 xlabel('Etapa')
-ylabel(Peso (lb))
+ylabel('Peso (lb)')
 
 
 

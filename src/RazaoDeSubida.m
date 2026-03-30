@@ -15,7 +15,8 @@ hp_to_W = 745.7;
 P_hp = 100;       % - Motor similar ao Bayraktar TB2
 P_W = P_hp*hp_to_W;
 
-W0_N = [500*9.81, 800*9.81]; % - Peso máximo da missão 1 e 2
+lb_to_kg = 0.453592;
+W0_N = [856.18*lb_to_kg*9.81, 1172.2*lb_to_kg*9.81]; % - Peso máximo da missão 1 e 2
 Sref_m2 = 13.6; % - área similar ao TAI Anka-S
 
 LDmax = 18;

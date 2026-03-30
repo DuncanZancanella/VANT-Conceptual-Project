@@ -1,4 +1,5 @@
-clc
+clc;
+close all;
 kmh_to_fts = 0.9113446583067 ;
 kg_to_lb = 2.2046226218      ;
 km_to_ft = 3280.84           ;
@@ -61,4 +62,5 @@ W0 = fzero(g, 1000)
 WfW0 = Wf(W0)/W0
 Wf = Wf(W0)
 We = WeW0(W0)*W0
+
 
