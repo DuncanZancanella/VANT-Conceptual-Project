@@ -35,9 +35,8 @@ M = v/a              ;
 
 
 % -- Estimativa da aeronave:
-Swet_Sref = 5; %Raymer fig 3.6 --> Beech Duchess
-Areawet = 1.8; %Raymer fig 3.5
-LD_max = 12;
+Swet_Sref = 3.5;
+LD_max = 18;
 LD_c = LD_max;
 LD_l = 0.866 * LD_max;
 
@@ -56,8 +55,8 @@ Wpl = CP_lb;
 
 % -- Peso Vazio
 Kvs = 1
-WeW0 = %@(W0)  A*(W0^c) * Kvs;
-We = % valor código missão 2
+%WeW0 = %@(W0)  A*(W0^c) * Kvs;
+We = 631.95 % valor código missão 2
 % -- Peso Combustível
 
 % W1/W0
@@ -100,5 +99,7 @@ x = [0,1,2,3,4,5,6];
 plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o')
 title('Evolução do Peso na Missão 1')
 grid('on')
+
+
 
 
