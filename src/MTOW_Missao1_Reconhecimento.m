@@ -100,9 +100,9 @@ x = [0,1,2,3,4,5,6];
 plot(x,[W0,W1,W2,W3,W4,W5,W6], 'b--o',  'LineWidth', 3)
 grid('on')
 
-title('Evolução do Peso na Missão 1', 'FontSize', 20)
-xlabel('Etapa', 'FontSize', 20)
-ylabel('Peso (lb)', 'FontSize', 20)
+title('Evolução do Peso na Missão 1', 'FontSize', 25)
+xlabel('Etapa', 'FontSize', 25)
+ylabel('Peso (lb)', 'FontSize', 25)
 set(gca, 'FontSize', 20)  % controla os números dos eixos (ticks)
 
 
