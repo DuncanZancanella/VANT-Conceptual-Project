@@ -69,6 +69,11 @@ class Equacioanmento_PW():
 
         return P_W
     
+    def conversionT_W(self, P_W):
+        T_W = P_W*(self.eta_prop*550/self.V_cruise_fts)
+
+        return T_W
+    
     def conversionCruiseTakeoff(self,P_Wcruise):
         # Pelo gráfico 5.2 do Sadraey,escolhendo a curva 0-320:
     
@@ -90,8 +95,11 @@ print('P/W para velocidade máxima: (hp/lb)', P_W_vmax)
 print('P/W para velocidade máxima: (W/kg)', P_W_vmax*745.7/0.453592)
 #estimativa P/W para cruzeiro:
 T_Wcruise = aircraft.T_Wcruise()
+
 P_Wcruise = aircraft.conversionP_W(T_Wcruise)
+
 P_Wtakeoff = aircraft.conversionCruiseTakeoff(P_Wcruise)
 print('P/W: (hp/lb)', P_Wtakeoff)
 print('P/W: (W/kg)', P_Wtakeoff*745.7/0.453592)
-    
+
+print(aircraft.conversionT_W(P_W_vmax))
