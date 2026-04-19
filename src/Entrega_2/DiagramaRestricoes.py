@@ -45,8 +45,8 @@ class AircraftEnvelope():
         self.LDmax = 18
         self.LDmax_climb = self.LDmax # poderia assumir um valor de proporcionalidade
         
-
-        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(self.rho_kgpm3_1000m*self.CLmax*3.5))
+        k_stall = 3.5 # adjust stall curve to fit range of known aircraft
+        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(self.rho_kgpm3_1000m*self.CLmax*k_stall))
         print(f'V_stall_mps = {self.V_stall_mps:.2f}')
 
 class Sadraey_Methods(AircraftEnvelope):
@@ -115,6 +115,7 @@ class Sadraey_Methods(AircraftEnvelope):
 
         --- --- ---
         Usually, the maximum speed is assumed between 20% or 30% higher than the cruise speed.
+
         --- --- ---
         INPUTS
 
@@ -123,7 +124,7 @@ class Sadraey_Methods(AircraftEnvelope):
         rho = local air density
 
         """
-        Vmax_mps = self.Vmax_mps
+        Vmax_mps = self.V_cruise_mps # used cruise speed as airspeed requirement for constant speed at specified altitude
 
         sigma = rho_kgpm3/self.rho_kgpm3_SL
 
@@ -160,9 +161,11 @@ class Sadraey_Methods(AircraftEnvelope):
         """
         sigma = rho_kgpm3_ceiling/self.rho_kgpm3_SL
 
-        P_W = (RoC_ceiling/eta_prop_climb) + np.sqrt( 2*W_S/( rho_kgpm3_ceiling * np.sqrt(3*self.CD0/self.k )  ) ) * (1.155/(self.LDmax_climb*eta_prop_climb))
+        num = (RoC_ceiling/self.eta_prop) + np.sqrt( 2*W_S/(rho_kgpm3_ceiling*np.sqrt(3*self.CD0/self.k) ) )*(1.155/(self.LDmax*self.eta_prop))
 
-        return sigma/P_W
+        P_W = num/sigma
+
+        return P_W
     
     def Range_restriction(self, W_S, rho_kgpm3, R_m = 500*10**3):
         """
@@ -187,9 +190,7 @@ class Sadraey_Methods(AircraftEnvelope):
 
         return 1/(T_W*self.V_cruise_mps/(self.eta_prop))
     
-
     def show_RestrictionDiagram(self):
-
         plt.rcParams.update({
             'font.family': 'Arial',
             'font.size': 10,
@@ -208,84 +209,129 @@ class Sadraey_Methods(AircraftEnvelope):
         W_S_stall = self.stall_restriction(rho_kgpm3=1.225)
         W_S_array = np.linspace(0.5, W_S_stall, 1000)
 
-        # --- Paleta monocromática 
+        # --- Paleta monocromática
         cores = {
-            'decolagem':    ('#111111', '-',    2.0, None,      'Decolagem'),
-            'max_speed':    ('#333333', '--',   2.0, None,      'Vel. máxima'),
-            'roc':          ('#555555', '-.',   2.0, None,      'Taxa de subida'),
-            'ceiling':      ('#888888', '-',    1.8, (None,50), 'Teto absoluto'),
+            'estol':     ('#000000', ':',          1.5),
+            'decolagem': ('#000000', '-',          2.0),
+            'cruzeiro':  ('#444444', '-',         2.0),
+            'subida':    ('#222222', (0, (5, 2)),  2.0),
+            'teto':      ('#777777', '-.',         1.8),
         }
 
         # --- 1) Estol
-        ax.axvline(x=W_S_stall, linestyle=':', linewidth=1.5, color='black',
-                label='Limite de estol', zorder=5)
+        ax.axvline(
+            x=W_S_stall,
+            linestyle=cores['estol'][1],
+            linewidth=cores['estol'][2],
+            color=cores['estol'][0],
+            label='Limite de estol',
+            zorder=5
+        )
 
         # --- 2) Decolagem
         P_W_takeoff = self.takeoff_restriction(
             W_S_array, S_TO=(2/3)*150, rho_kgpm3=1.1117, mu=0.05)
-        ax.plot(W_S_array, P_W_takeoff,
-                linestyle='-', linewidth=2.0, color='#111111',
-                label='Decolagem', zorder=4)
-
-        # --- 3) Velocidade máxima
-        W_P_maxspeed = self.maximumSpeed_restriction(W_S_array, rho_kgpm3=1.225)
-        ax.plot(W_S_array, 1/W_P_maxspeed,
-                linestyle='--', linewidth=2.0, color='#333333',
-                label='Vel. máxima', zorder=4)
-
-        # --- 4) Taxa de subida
-        W_P_roc = self.RoC_restriction(W_S_array, RoC_mps=17, rho_kgpm3=1.225)
-        ax.plot(W_S_array, 1/W_P_roc,
-                linestyle='-.', linewidth=2.0, color='#555555',
-                label='Taxa de subida', zorder=4)
-
-        # --- 5) Teto absoluto
-        W_P_ceiling = self.Ceiling_restriction(
-            W_S_array, RoC_ceiling=0.508, rho_kgpm3_ceiling=1.1117)
-        ax.plot(W_S_array, 1/W_P_ceiling,
-                linestyle='-', linewidth=1.8, color='#888888',
-                marker='x', markevery=50, markersize=5,
-                label='Teto de serviço', zorder=4)
-
-    
-        #plt.plot(W_S_stall, 50, '*', color='blue', markersize=18, label='Ponto de projeto')
-
-        # --- Sombreamento 
-        cap = np.full(1000, 150.0)
-
-        ax.fill_between(W_S_array, P_W_takeoff,         cap,
-                        alpha=0.12, color='#111111', label='_nolegend_')
-        ax.fill_between(W_S_array, 1/W_P_maxspeed,      cap,
-                        alpha=0.4, color="#00A9EC", label='Região viável')
-        ax.fill_between(W_S_array, 1/W_P_roc,           cap,
-                        alpha=0.08, color='#555555', label='_nolegend_')
-        ax.fill_between(W_S_array, 1/W_P_ceiling,       cap,
-                        alpha=0.06, color='#888888', label='_nolegend_')
-
-
-
-        # --- Formatação 
-        ax.set_xlabel(r'$W/S$  [kg/m²]', fontsize=11)
-        ax.set_ylabel(r'$P/W$  [W/kg]',  fontsize=11)
-        #ax.set_xlim(0, 300)
-        ax.set_ylim(0, 100)
-        ax.tick_params(direction='in', length=4, width=0.6)
-
-        # --- Legenda 
-        ax.legend(loc='upper left', frameon=True, ncol=1,
-                title='Restrições de projeto', title_fontsize=9)
-        ax.set_title(
-            'Diagrama de Restrições — Metodologia Sadraey\n',
-            fontsize=11, loc='center', pad=10
+        ax.plot(
+            W_S_array, P_W_takeoff,
+            linestyle=cores['decolagem'][1],
+            linewidth=cores['decolagem'][2],
+            color=cores['decolagem'][0],
+            label='Decolagem',
+            zorder=4
         )
 
-        # --- Grade secundária 
+        # --- 3) Cruzeiro
+        W_P_maxspeed = self.maximumSpeed_restriction(W_S_array, rho_kgpm3=1.1117)
+        ax.plot(
+            W_S_array, 1/W_P_maxspeed,
+            linestyle=cores['cruzeiro'][1],
+            linewidth=cores['cruzeiro'][2],
+            color=cores['cruzeiro'][0],
+            label='Cruzeiro',
+            zorder=4,
+            marker='x', markevery=50, markersize=5,
+        )
+
+        # --- 4) Taxa de subida
+        W_P_roc = self.RoC_restriction(W_S_array, RoC_mps=17, rho_kgpm3=1.1117)
+        ax.plot(
+            W_S_array, 1/W_P_roc,
+            linestyle=cores['subida'][1],
+            linewidth=cores['subida'][2],
+            color=cores['subida'][0],
+            label='Taxa de subida',
+            zorder=4
+        )
+
+        # --- 5) Teto absoluto
+        P_W_ceiling = self.Ceiling_restriction(
+            W_S_array, RoC_ceiling=5.0, rho_kgpm3_ceiling=1.1117)
+        ax.plot(
+            W_S_array, P_W_ceiling,
+            linestyle=cores['teto'][1],
+            linewidth=cores['teto'][2],
+            color=cores['teto'][0],
+            label='Teto de serviço',
+            zorder=4
+        )
+
+        # --- Sombreamento monocromático
+        cap = np.full(1000, 150.0)
+        ax.fill_between(W_S_array, 1/W_P_maxspeed, cap, alpha=0.18, color='#444444', label='Região viável')
+    
+        # --- Formatação dos eixos
+        ax.set_xlabel(r'$W/S$  [kg/m²]', fontsize=11)
+        ax.set_ylabel(r'$P/W$  [W/kg]',  fontsize=11)
+        ax.set_ylim(0, 150)
+        ax.tick_params(direction='in', length=4, width=0.6, top=True, right=True)
+
+        # --- Eixos secundários (unidades imperiais)
+        # Fatores: 1hp = 745.7W, 1kg = 2.2046lb, 1m = 3.28084ft
+        secax_x = ax.secondary_xaxis(
+            'top',
+            functions=(
+                lambda x: x * 2.2046 / 3.28084**2,
+                lambda x: x / 2.2046 * 3.28084**2
+            )
+        )
+        secax_x.set_xlabel(r'$W/S$  [lb/ft²]', fontsize=11)
+        secax_x.tick_params(direction='in', length=4, width=0.6)
+
+        secax_y = ax.secondary_yaxis(
+            'right',
+            functions=(
+                lambda y: y / 745.7 / 2.2046,
+                lambda y: y * 745.7 * 2.2046
+            )
+        )
+        secax_y.set_ylabel(r'$P/W$  [hp/lb]', fontsize=11)
+        secax_y.tick_params(direction='in', length=4, width=0.6)
+
+        #ax.scatter(60, 128.2, marker='*', s=80, color='blue', label='Ponto de Projeto')
+
+
+        # --- Legenda
+        ax.legend(
+            loc='upper left',
+            frameon=True,
+            ncol=1,
+            title='Restrições de projeto',
+            title_fontsize=9,
+            handlelength=2.5
+        )
+
+        # --- Título
+        ax.set_title(
+            'Diagrama de Restrições — Metodologia Sadraey',
+            fontsize=11, fontweight='bold', loc='center', pad=10
+        )
+
+        # --- Grade secundária
         ax.minorticks_on()
         ax.grid(which='minor', linestyle=':', linewidth=0.2, alpha=0.4)
 
         fig.tight_layout()
-        fig.savefig('RestrictionsDiagram_Sadraey.png', dpi=300, bbox_inches='tight')
-        #plt.show()
+        fig.savefig('RestrictionsDiagram_Sadraey.pdf', dpi=300, bbox_inches='tight')        #plt.show()
 
 
 class Gudmundsson_Methods(AircraftEnvelope):
@@ -325,7 +371,7 @@ class Gudmundsson_Methods(AircraftEnvelope):
 
         rho_kgpm3 = local air density
         """
-        V_LOF_mps = 1.1 * self.V_stall_mps # FAR 23 approximation
+        V_LOF_mps = 1.2 * self.V_stall_mps # FAR 23 approximation
         CL_TO = 0.9 * self.CLmax           # FAR 23 approximation
 
         q_Pa = 0.5*rho_kgpm3*V_LOF_mps**2
@@ -345,9 +391,9 @@ class Gudmundsson_Methods(AircraftEnvelope):
         rho_kgpm3 = local air density
         """
 
-        q_Pa = 0.5 * rho_kgpm3 * self.V_cruise_mps
+        q_Pa = 0.5 * rho_kgpm3 * self.V_cruise_mps**2
 
-        T_W = q_Pa*self.CD/W_S + self.k/q_Pa*W_S
+        T_W = q_Pa*self.CD0/W_S + self.k/q_Pa*W_S
 
         # --- converting to power
         P_W = T_W * self.V_cruise_mps/self.eta_prop
@@ -404,9 +450,7 @@ class Gudmundsson_Methods(AircraftEnvelope):
 
         return P_W
 
-
     def show_RestrictionDiagram(self):
-
         plt.rcParams.update({
             'font.family': 'Arial',
             'font.size': 10,
@@ -427,64 +471,135 @@ class Gudmundsson_Methods(AircraftEnvelope):
 
         # --- Paleta monocromática 
         cores = {
-            'decolagem':    ('#111111', '-',    2.0, None,      'Decolagem'),
-            'max_speed':    ('#333333', '--',   2.0, None,      'Vel. máxima'),
-            'roc':          ('#555555', '-.',   2.0, None,      'Taxa de subida'),
-            'ceiling':      ('#888888', '-',    1.8, (None,50), 'Teto absoluto'),
+            'estol':      ('#000000', ':',   1.5),
+            'decolagem':  ('#000000', '-',   2.0),
+            'cruzeiro':   ('#444444', '-',  2.0),
+            'teto':       ('#777777', '-.',  1.8),
+            'subida':     ('#222222', (0,(5,2)), 2.0),
+            'curva':      ('#555555', '-', 2.0),
         }
 
         # --- 1) Estol
-        ax.axvline(x=W_S_stall, linestyle=':', linewidth=1.5, color='black',
-                label='Limite de estol', zorder=5)
+        ax.axvline(
+            x=W_S_stall,
+            linestyle=cores['estol'][1],
+            linewidth=cores['estol'][2],
+            color=cores['estol'][0],
+            label='Limite de estol',
+            zorder=5
+        )
 
         # --- 2) Decolagem
-        P_W_takeoff = self.takeoff_restriction(W_S_array, S_G_m=2/3*150, rho_kgpm3=1.1117, mu = 0.03)
-        ax.plot(W_S_array, P_W_takeoff,
-                linestyle='-', linewidth=2.0, color='#111111',
-                label='Decolagem', zorder=4)
-        
+        P_W_takeoff = self.takeoff_restriction(W_S_array, S_G_m=150, rho_kgpm3=1.1117, mu=0.03)
+        ax.plot(
+            W_S_array, P_W_takeoff,
+            linestyle=cores['decolagem'][1],
+            linewidth=cores['decolagem'][2],
+            color=cores['decolagem'][0],
+            label='Decolagem',
+            zorder=4
+        )
+
         # --- 3) Cruzeiro
-        P_W_cruise = self.cruise_restriction(W_S_array, rho_kgpm3= 1.1117)
-        ax.plot(W_S_array, P_W_cruise,
-                linestyle='--', linewidth=2.0, color='#333333',
-                label='Cruzeiro', zorder=4)
-        
+        P_W_cruise = self.cruise_restriction(W_S_array, rho_kgpm3=1.1117)
+        ax.plot(
+            W_S_array, P_W_cruise,
+            linestyle=cores['cruzeiro'][1],
+            linewidth=cores['cruzeiro'][2],
+            color=cores['cruzeiro'][0],
+            label='Cruzeiro',
+            zorder=4,
+            marker='x', markevery=50, markersize=5
+        )
+
         # --- 4) Teto de serviço
-        P_W_ceiling = self.service_ceiling_restriction(W_S_array, rho_kgpm3=1.1117)
-        ax.plot(W_S_array, P_W_ceiling,
-                linestyle='-', linewidth=1.8, color='#888888',
-                marker='x', markevery=50, markersize=5,
-                label='Teto de serviço', zorder=4)
-        
+        P_W_ceiling = self.service_ceiling_restriction(W_S_array, rho_kgpm3=1.0066)
+        ax.plot(
+            W_S_array, P_W_ceiling,
+            linestyle=cores['teto'][1],
+            linewidth=cores['teto'][2],
+            color=cores['teto'][0],
+            #marker='x', markevery=50, markersize=5,
+            label='Teto de serviço',
+            zorder=4
+        )
+
         # --- 5) Taxa de subida
-        P_W_roc = self.climb_restriction(W_S_array, rho_kgpm3=1.1117, RoC_mps=11)
-        ax.plot(W_S_array, P_W_roc,
-                linestyle='-.', linewidth=2.0, color="#FF0000",
-                label='Taxa de subida', zorder=4)
-        
+        P_W_roc = self.climb_restriction(W_S_array, rho_kgpm3=1.1117, RoC_mps=17)
+        ax.plot(
+            W_S_array, P_W_roc,
+            linestyle=cores['subida'][1],
+            linewidth=cores['subida'][2],
+            color=cores['subida'][0],
+            label='Taxa de subida',
+            zorder=4
+        )
+
         # --- 6) Curva sustentada
         P_W_curve = self.sustained_turn_restriction(W_S_array, rho_kgpm3=1.1117, bank_angle_deg=45)
-        ax.plot(W_S_array, P_W_curve,
-                linestyle='-', linewidth=2.0, color="#8400FF",
-                label='Curva sustentada', zorder=4)
+        ax.plot(
+            W_S_array, P_W_curve,
+            linestyle=cores['curva'][1],
+            linewidth=cores['curva'][2],
+            color=cores['curva'][0],
+            label='Curva sustentada',
+            zorder=4,
+            marker='s', markevery=50, markersize=5
+        )
 
-        # --- Formatação 
+        #ax.scatter(60, 128.2, marker='*', s=80, color='blue', label='Ponto de Projeto')
+
+        # --- Formatação dos eixos
         ax.set_xlabel(r'$W/S$  [kg/m²]', fontsize=11)
         ax.set_ylabel(r'$P/W$  [W/kg]',  fontsize=11)
-        #ax.set_xlim(0, 300)
-        ax.set_ylim(0, 150)
-        ax.tick_params(direction='in', length=4, width=0.6)
+        ax.set_ylim(0, 200)
+        ax.tick_params(direction='in', length=4, width=0.6, top=True, right=True)
 
-        # --- Legenda 
-        ax.legend(loc='upper left', frameon=True, ncol=1,
-                title='Restrições de projeto', title_fontsize=9)
+        # --- Eixos secundários 
+        # 1hp = 745.7W, 1kg = 2.2046lb, 1m = 3.28084ft
+
+        secax_x = ax.secondary_xaxis(
+            'top',
+            functions=(
+                lambda x: x * 2.2046 / 3.28084**2,   # kg/m² → lb/ft²
+                lambda x: x / 2.2046 * 3.28084**2    # lb/ft² → kg/m²
+            )
+        )
+        secax_x.set_xlabel(r'$W/S$  [lb/ft²]', fontsize=11)
+        secax_x.tick_params(direction='in', length=4, width=0.6)
+
+        secax_y = ax.secondary_yaxis(
+            'right',
+            functions=(
+                lambda y: y / 745.7 / 2.2046,   # W/kg → hp/lb
+                lambda y: y * 745.7 * 2.2046    # hp/lb → W/kg
+            )
+        )
+        secax_y.set_ylabel(r'$P/W$  [hp/lb]', fontsize=11)
+        secax_y.tick_params(direction='in', length=4, width=0.6)
+
+        ax.fill_between(W_S_array, P_W_cruise,     [200]*1000,
+                        alpha=0.2, color='#888888', label='Região viável')
+        
+        # --- Legenda
+        ax.legend(
+            loc='upper left',
+            frameon=True,
+            ncol=1,
+            title='Restrições de projeto',
+            title_fontsize=9,
+            handlelength=2.5
+        )
+
+        # --- Título
         ax.set_title(
-            'Diagrama de Restrições — Metodologia Gudmundsson\n',
-            fontsize=11, loc='center', pad=10
+            'Diagrama de Restrições — Metodologia Gudmundsson',
+            fontsize=11, fontweight='bold', loc='center', pad=10
         )
 
         fig.tight_layout()
-        fig.savefig('RestrictionsDiagram_Gudmundsson.png', dpi=300, bbox_inches='tight')
+        fig.savefig('RestrictionsDiagram_Gudmundsson.pdf', dpi=300, bbox_inches='tight')
+        #plt.show()
 
 diagram_sadraey =  Sadraey_Methods()
 diagram_sadraey.show_RestrictionDiagram()
