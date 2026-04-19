@@ -35,7 +35,7 @@ class Equacionamento():
         self.AR = 14
 
         # --- Aerodynamics
-        self.CLmax = 1.8
+        self.CLmax = 1.26
 
         self.e = 0.9 # wing efficiency
         
@@ -75,19 +75,6 @@ class Equacionamento():
 
         return T_W
     
-    def conversionCruiseTakeoff(self,P_Wcruise):
-        # Pelo gráfico 5.2 do Sadraey,escolhendo a curva 0-320:
-    
-    #para h_takeoff = 1000m --> P = 150 hp
-    #para h_serviço  = 3000m --> P = 110 hp
-        Pto_Pc = 150/110
-        W_takeoff = self.W0_lb
-        W_cruise1 = 1120
- 
-        P_Wtakeoff = P_Wcruise*(W_cruise1/self.W0_lb)*(Pto_Pc)
-
-        return P_Wtakeoff
-    
     def P_W_subida(self):
         T_Ws = 1/self.LDcruise + (self.RoC_mps/3.28)/self.V_cruise_fts
         P_Ws = T_Ws/(self.eta_prop*550/self.V_cruise_fts)
@@ -96,12 +83,16 @@ class Equacionamento():
 
 
     def P_W_LD(self):
-        T_W = 1/self.LDcruise
+    # Pelo gráfico 5.2 do Sadraey,escolhendo a curva 0-320:
+    
+    #para h_takeoff = 1000m --> P = 150 hp
+    #para h_serviço  = 3000m --> P = 110 hp
+        T_Wc = 1/self.LDcruise
         T_cru = 110*self.eta_prop*550/self.V_cruise_fts
         T_to = 150*self.eta_prop*550/self.V_cruise_fts
-        T_Wto = T_W*(T_to/T_cru)*(self.W0_lb/1120)
+        T_Wto = T_Wc*(T_to/T_cru)*(self.W0_lb/1120)
         P_Wto = T_Wto/(self.eta_prop*550/self.V_cruise_fts)
-        return T_Wto, P_Wto
+        return T_Wc,T_Wto, P_Wto
     
     def W_S_cruise(self):
         q = 0.5*self.rho_kgpm3_2000*(self.V_cruise_mps**2)
@@ -118,6 +109,13 @@ class Equacionamento():
         ws_stall = q*self.CLmax
         return ws_stall
 
+    def W_S_decolagem(self,P_W_est):
+        ws = 500*self.rho_kgpm3_2000/self.rho_kgpm3_SL*P_W_est
+        return ws
+
+    def W_S_pouso(self,S_pouso):
+        return (S_pouso - 0/3.28)*(self.rho_kgpm3_2000/self.rho_kgpm3_SL)*self.CLmax
+        
 
 aircraft = Equacionamento()
 
@@ -128,23 +126,17 @@ print('P/W para velocidade máxima: (hp/lb)', P_W_vmax)
 print('P/W para velocidade máxima: (W/kg)', P_W_vmax_si)
 
 
-#estimativa P/W para cruzeiro:
-T_Wcruise = aircraft.T_Wcruise()
-P_Wcruise = aircraft.conversionP_W(T_Wcruise)
-P_Wtakeoff = aircraft.conversionCruiseTakeoff(P_Wcruise)
-P_Wtakeoff_si = P_Wtakeoff*745.7/0.453592
-print('P/W: (hp/lb)', P_Wtakeoff)
-print('P/W: (W/kg)', P_Wtakeoff_si)
-
-#noch 
-twto,pwto = aircraft.P_W_LD()
-print('Recálculo P_Wto (hp/lb):' ,pwto)
-print('Recálculo P_Wto (W/kg):' ,pwto*745.7/0.453592)
+#estimativa P/W por L/D:
+T_W_cru,T_W_to,P_W_to = aircraft.P_W_LD()
+print('T/W por L/D',T_W_to)
+print('P/W por L/D corrigido (hp/lb):' ,P_W_to)
+print('P/W por L/D corrigido  (W/kg):' ,P_W_to*745.7/0.453592)
 
 #estimativa P_W para subida:
 T_W_subida, P_W_subida = aircraft.P_W_subida()
 print('T/W subida:',T_W_subida)
 print('P/W subida: (hp/lb)',P_W_subida)
+print('P/W subida: (W/kg)',P_W_subida*745.7/0.453592)
 
 
 #estimativa W/S para cruzeiro:
@@ -162,3 +154,18 @@ W_S_stall_si = aircraft.W_S_vstall()
 W_S_stall = W_S_stall_si*0.2048
 print('W/S para Vstall: (kg/m^2)', W_S_stall_si)
 print('W/S para Vstall: (lb/ft^2)', W_S_stall)
+
+#decolagem assumindo P/W=115 W/kg
+P_W_est = 115*0.453592/745.7
+W_S_decolagem = aircraft.W_S_decolagem(P_W_est)
+W_S_decolagem_si = W_S_decolagem/0.2048
+print('W/S para decolagem: (kg/m^2)', W_S_decolagem_si)
+print('W/S para decolagem: (lb/ft^2)', W_S_decolagem)
+
+#pouso assumindo pista de 150m
+S_pouso = 150 
+W_S_pouso_si = aircraft.W_S_pouso(S_pouso)
+W_S_pouso = W_S_pouso_si*0.2048
+print('W/S para pouso: (kg/m^2)', W_S_pouso_si)
+print('W/S para pouso: (lb/ft^2)', W_S_pouso)
+
