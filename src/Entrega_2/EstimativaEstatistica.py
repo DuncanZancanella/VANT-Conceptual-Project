@@ -22,6 +22,7 @@ class Equacionamento():
         kmph_to_ftps = 0.911344
 
         self.rho_kgpm3_SL = 1.225 # at Sea Level
+        self.rho_kgpm3_3000 = 0.84 # at 3000m
 
         self.V_cruise_mps = 250*kmph_to_mps
         self.V_cruise_fts = 250*kmph_to_ftps
@@ -88,17 +89,17 @@ class Equacionamento():
         return P_Wtakeoff
     
     def W_S_cruise(self):
-        q = 0.5*self.rho_kgpm3_SL*(self.V_cruise_mps**2)
+        q = 0.5*self.rho_kgpm3_3000*(self.V_cruise_mps**2)
         ws = q*np.sqrt(np.pi*self.e*self.AR*self.CD0)
         return ws
     
     def W_S_cruise_loiter(self):
-        q = 0.5*self.rho_kgpm3_SL*(self.V_cruise_mps**2)
+        q = 0.5*self.rho_kgpm3_3000*(self.V_cruise_mps**2)
         wsl = q*np.sqrt(3*np.pi*self.e*self.AR*self.CD0)
         return wsl
 
     def W_S_vstall(self):
-        q = 0.5*self.rho_kgpm3_SL*(self.V_stall_mps**2)
+        q = 0.5*self.rho_kgpm3_3000*(self.V_stall_mps**2)
         ws_stall = q*self.CLmax
         return ws_stall
 
@@ -110,7 +111,7 @@ P_W_vmax = aircraft.P_W_vmax()
 P_W_vmax_si = P_W_vmax*745.7/0.453592
 print('P/W para velocidade máxima: (hp/lb)', P_W_vmax)
 print('P/W para velocidade máxima: (W/kg)', P_W_vmax_si)
-print(aircraft.conversionT_W(P_W_vmax))
+
 
 #estimativa P/W para cruzeiro:
 T_Wcruise = aircraft.T_Wcruise()
