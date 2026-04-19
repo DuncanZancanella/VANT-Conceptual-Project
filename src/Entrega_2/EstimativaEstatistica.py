@@ -88,6 +88,21 @@ class Equacionamento():
 
         return P_Wtakeoff
     
+    def P_W_subida(self):
+        T_Ws = 1/self.LDcruise + (self.RoC_mps/3.28)/self.V_cruise_fts
+        P_Ws = T_Ws/(self.eta_prop*550/self.V_cruise_fts)
+        return P_Ws
+
+
+
+    def P_W_LD(self):
+        T_W = 1/self.LDcruise
+        T_cru = 110*self.eta_prop*550/self.V_cruise_fts
+        T_to = 150*self.eta_prop*550/self.V_cruise_fts
+        T_Wto = T_W*(T_to/T_cru)*(self.W0_lb/1120)
+        P_Wto = T_Wto/(self.eta_prop*550/self.V_cruise_fts)
+        return T_Wto, P_Wto
+    
     def W_S_cruise(self):
         q = 0.5*self.rho_kgpm3_3000*(self.V_cruise_mps**2)
         ws = q*np.sqrt(np.pi*self.e*self.AR*self.CD0)
@@ -120,6 +135,16 @@ P_Wtakeoff = aircraft.conversionCruiseTakeoff(P_Wcruise)
 P_Wtakeoff_si = P_Wtakeoff*745.7/0.453592
 print('P/W: (hp/lb)', P_Wtakeoff)
 print('P/W: (W/kg)', P_Wtakeoff_si)
+
+#noch 
+twto,pwto = aircraft.P_W_LD()
+print('Recálculo P_Wto (hp/lb):' ,pwto)
+print('Recálculo P_Wto (W/kg):' ,pwto*745.7/0.453592)
+
+#estimativa P_W para subida:
+P_W_subida = aircraft.P_W_subida()
+print('P/W subida: (hp/lb)',P_W_subida)
+
 
 #estimativa W/S para cruzeiro:
 W_S_cruise_si = aircraft.W_S_cruise()
