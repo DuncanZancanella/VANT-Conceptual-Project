@@ -1,6 +1,6 @@
 import numpy as np
 
-class Equacioanmento():
+class Equacionamento():
     
     def __init__(self):
         self.aircraft = {'W/S': [],
@@ -98,7 +98,7 @@ class Equacioanmento():
         return wsl
 
     
-aircraft = Equacioanmento()
+aircraft = Equacionamento()
 
 #estimativa velocidade máxima:
 P_W_vmax = aircraft.P_W_vmax()
