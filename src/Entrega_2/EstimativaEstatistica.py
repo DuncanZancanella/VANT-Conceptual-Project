@@ -1,6 +1,6 @@
 import numpy as np
 
-class Equacioanmento_PW():
+class Equacioanmento():
     
     def __init__(self):
         self.aircraft = {'W/S': [],
@@ -83,23 +83,45 @@ class Equacioanmento_PW():
         W_takeoff = self.W0_lb
         W_cruise1 = 1120
  
-        P_Wtakeoff = P_Wcruise*(W_cruise1/self.W0_lb)*(150/110)
+        P_Wtakeoff = P_Wcruise*(W_cruise1/self.W0_lb)*(Pto_Pc)
 
         return P_Wtakeoff
     
-aircraft = Equacioanmento_PW()
+    def W_S_cruise(self):
+        q = 0.5*self.rho_kgpm3_SL*(self.V_cruise_mps**2)
+        ws = q*np.sqrt(np.pi*self.e*self.AR*self.CD0)
+        return ws
+    
+    def W_S_cruise_loiter(self):
+        q = 0.5*self.rho_kgpm3_SL*(self.V_cruise_mps**2)
+        wsl = q*np.sqrt(3*np.pi*self.e*self.AR*self.CD0)
+        return wsl
+
+    
+aircraft = Equacioanmento()
 
 #estimativa velocidade máxima:
 P_W_vmax = aircraft.P_W_vmax()
+P_W_vmax_si = P_W_vmax*745.7/0.453592
 print('P/W para velocidade máxima: (hp/lb)', P_W_vmax)
-print('P/W para velocidade máxima: (W/kg)', P_W_vmax*745.7/0.453592)
+print('P/W para velocidade máxima: (W/kg)', P_W_vmax_si)
+print(aircraft.conversionT_W(P_W_vmax))
+
 #estimativa P/W para cruzeiro:
 T_Wcruise = aircraft.T_Wcruise()
-
 P_Wcruise = aircraft.conversionP_W(T_Wcruise)
-
 P_Wtakeoff = aircraft.conversionCruiseTakeoff(P_Wcruise)
+P_Wtakeoff_si = P_Wtakeoff*745.7/0.453592
 print('P/W: (hp/lb)', P_Wtakeoff)
-print('P/W: (W/kg)', P_Wtakeoff*745.7/0.453592)
+print('P/W: (W/kg)', P_Wtakeoff_si)
 
-print(aircraft.conversionT_W(P_W_vmax))
+#estimativa W/S para cruzeiro:
+W_S_cruise_si = aircraft.W_S_cruise()
+W_S_cruise = W_S_cruise_si*0.2048
+print('W/S para cruzeiro: (kg/m^2)', W_S_cruise_si)
+print('W/S para cruzeiro: (lb/ft^2)', W_S_cruise)
+
+W_S_cruise_loiter_si = aircraft.W_S_cruise_loiter()
+W_S_cruise_loiter = W_S_cruise_loiter_si*0.2048
+print('W/S para loiter: (kg/m^2)', W_S_cruise_loiter_si)
+print('W/S para loiter: (lb/ft^2)', W_S_cruise_loiter)
