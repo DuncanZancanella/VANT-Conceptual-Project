@@ -22,6 +22,7 @@ class Equacionamento():
         kmph_to_ftps = 0.911344
 
         self.rho_kgpm3_SL = 1.225 # at Sea Level
+        self.rho_kgpm3_1000 = 1.1117 # at 1000m altitude
         self.rho_kgpm3_2000 = 0.94 # at 2000m
 
         self.V_cruise_mps = 250*kmph_to_mps
@@ -49,7 +50,8 @@ class Equacionamento():
         self.LDmax_climb = self.LDmax # poderia assumir um valor de proporcionalidade
         
 
-        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(2*self.rho_kgpm3_2000*self.CLmax))
+        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(self.rho_kgpm3_1000*self.CLmax*3.5))
+        print(f'V_stall_mps = {self.V_stall_mps:.2f}')
 
     def P_W_vmax(self):
         a = 0.025
@@ -105,16 +107,16 @@ class Equacionamento():
         return wsl
 
     def W_S_vstall(self):
-        q = 0.5*self.rho_kgpm3_2000*(self.V_stall_mps**2)
+        q = 0.5*self.rho_kgpm3_1000*(self.V_stall_mps**2)
         ws_stall = q*self.CLmax
         return ws_stall
 
     def W_S_decolagem(self,P_W_est):
-        ws = 500*self.rho_kgpm3_2000/self.rho_kgpm3_SL*P_W_est
+        ws = 500*self.rho_kgpm3_2000/self.rho_kgpm3_1000*P_W_est
         return ws
 
     def W_S_pouso(self,S_pouso):
-        return (S_pouso - 0/3.28)*(self.rho_kgpm3_2000/self.rho_kgpm3_SL)*self.CLmax
+        return (S_pouso - 0/3.28)*(self.rho_kgpm3_1000/self.rho_kgpm3_SL)*self.CLmax
         
 
 aircraft = Equacionamento()
@@ -138,17 +140,6 @@ print('T/W subida:',T_W_subida)
 print('P/W subida: (hp/lb)',P_W_subida)
 print('P/W subida: (W/kg)',P_W_subida*745.7/0.453592)
 
-
-#estimativa W/S para cruzeiro:
-W_S_cruise_si = aircraft.W_S_cruise()
-W_S_cruise = W_S_cruise_si*0.2048
-print('W/S para cruzeiro: (kg/m^2)', W_S_cruise_si)
-print('W/S para cruzeiro: (lb/ft^2)', W_S_cruise)
-
-W_S_cruise_loiter_si = aircraft.W_S_cruise_loiter()
-W_S_cruise_loiter = W_S_cruise_loiter_si*0.2048
-print('W/S para loiter: (kg/m^2)', W_S_cruise_loiter_si)
-print('W/S para loiter: (lb/ft^2)', W_S_cruise_loiter)
 
 W_S_stall_si = aircraft.W_S_vstall()
 W_S_stall = W_S_stall_si*0.2048
