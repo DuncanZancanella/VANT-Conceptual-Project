@@ -97,7 +97,12 @@ class Equacionamento():
         wsl = q*np.sqrt(3*np.pi*self.e*self.AR*self.CD0)
         return wsl
 
-    
+    def W_S_vstall(self):
+        q = 0.5*self.rho_kgpm3_SL*(self.V_stall_mps**2)
+        ws_stall = q*self.CLmax
+        return ws_stall
+
+
 aircraft = Equacionamento()
 
 #estimativa velocidade máxima:
@@ -125,3 +130,8 @@ W_S_cruise_loiter_si = aircraft.W_S_cruise_loiter()
 W_S_cruise_loiter = W_S_cruise_loiter_si*0.2048
 print('W/S para loiter: (kg/m^2)', W_S_cruise_loiter_si)
 print('W/S para loiter: (lb/ft^2)', W_S_cruise_loiter)
+
+W_S_stall_si = aircraft.W_S_vstall()
+W_S_stall = W_S_stall_si*0.2048
+print('W/S para Vstall: (kg/m^2)', W_S_stall_si)
+print('W/S para Vstall: (lb/ft^2)', W_S_stall)
