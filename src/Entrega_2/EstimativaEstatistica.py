@@ -22,7 +22,7 @@ class Equacionamento():
         kmph_to_ftps = 0.911344
 
         self.rho_kgpm3_SL = 1.225 # at Sea Level
-        self.rho_kgpm3_3000 = 0.84 # at 3000m
+        self.rho_kgpm3_2000 = 0.94 # at 2000m
 
         self.V_cruise_mps = 250*kmph_to_mps
         self.V_cruise_fts = 250*kmph_to_ftps
@@ -49,7 +49,7 @@ class Equacionamento():
         self.LDmax_climb = self.LDmax # poderia assumir um valor de proporcionalidade
         
 
-        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(2*self.rho_kgpm3_SL*self.CLmax))
+        self.V_stall_mps = np.sqrt( (2*self.W0_kg)/(2*self.rho_kgpm3_2000*self.CLmax))
 
     def P_W_vmax(self):
         a = 0.025
@@ -91,7 +91,7 @@ class Equacionamento():
     def P_W_subida(self):
         T_Ws = 1/self.LDcruise + (self.RoC_mps/3.28)/self.V_cruise_fts
         P_Ws = T_Ws/(self.eta_prop*550/self.V_cruise_fts)
-        return P_Ws
+        return T_Ws, P_Ws
 
 
 
@@ -104,17 +104,17 @@ class Equacionamento():
         return T_Wto, P_Wto
     
     def W_S_cruise(self):
-        q = 0.5*self.rho_kgpm3_3000*(self.V_cruise_mps**2)
+        q = 0.5*self.rho_kgpm3_2000*(self.V_cruise_mps**2)
         ws = q*np.sqrt(np.pi*self.e*self.AR*self.CD0)
         return ws
     
     def W_S_cruise_loiter(self):
-        q = 0.5*self.rho_kgpm3_3000*(self.V_cruise_mps**2)
+        q = 0.5*self.rho_kgpm3_2000*(self.V_cruise_mps**2)
         wsl = q*np.sqrt(3*np.pi*self.e*self.AR*self.CD0)
         return wsl
 
     def W_S_vstall(self):
-        q = 0.5*self.rho_kgpm3_3000*(self.V_stall_mps**2)
+        q = 0.5*self.rho_kgpm3_2000*(self.V_stall_mps**2)
         ws_stall = q*self.CLmax
         return ws_stall
 
@@ -142,7 +142,8 @@ print('Recálculo P_Wto (hp/lb):' ,pwto)
 print('Recálculo P_Wto (W/kg):' ,pwto*745.7/0.453592)
 
 #estimativa P_W para subida:
-P_W_subida = aircraft.P_W_subida()
+T_W_subida, P_W_subida = aircraft.P_W_subida()
+print('T/W subida:',T_W_subida)
 print('P/W subida: (hp/lb)',P_W_subida)
 
 
