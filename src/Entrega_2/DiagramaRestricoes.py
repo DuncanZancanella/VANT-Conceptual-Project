@@ -34,7 +34,7 @@ class AircraftEnvelope():
         self.AR = 14
 
         # --- Aerodynamics
-        self.CLmax = 1.8
+        self.CLmax = 1.63 # Clark-Y
 
         self.e = 0.9 # wing efficiency
         
@@ -307,8 +307,9 @@ class Sadraey_Methods(AircraftEnvelope):
         secax_y.set_ylabel(r'$P/W$  [hp/lb]', fontsize=11)
         secax_y.tick_params(direction='in', length=4, width=0.6)
 
-        #ax.scatter(60, 128.2, marker='*', s=80, color='blue', label='Ponto de Projeto')
-
+        ax.scatter(70, 120.6, marker='*', s=80, color='blue', label='Ponto de Projeto')
+        ax.plot([0, W_S_stall], [120.6, 120.6], label='Motor T422', linestyle=':', linewidth=1.5, color='blue')
+        ax.plot([70, 70], [0, 120.6], label='Carga-alar de projeto', linestyle='-.', linewidth=1.5, color='blue')
 
         # --- Legenda
         ax.legend(
@@ -547,7 +548,9 @@ class Gudmundsson_Methods(AircraftEnvelope):
             marker='s', markevery=50, markersize=5
         )
 
-        #ax.scatter(60, 128.2, marker='*', s=80, color='blue', label='Ponto de Projeto')
+        ax.scatter(70, 120.6, marker='*', s=80, color='blue', label='Ponto de Projeto')
+        ax.plot([0, W_S_stall], [120.6, 120.6], label='Motor T422', linestyle=':', linewidth=1.5, color='blue')
+        ax.plot([70, 70], [0, 120.6], label='Carga-alar de projeto', linestyle='-.', linewidth=1.5, color='blue')
 
         # --- Formatação dos eixos
         ax.set_xlabel(r'$W/S$  [kg/m²]', fontsize=11)
