@@ -138,7 +138,7 @@ print('W/S para Vstall: (kg/m^2)', W_S_stall_si)
 print('W/S para Vstall: (lb/ft^2)', W_S_stall)
 
 #decolagem assumindo P/W=115 W/kg
-P_W_est = 115*0.453592/745.7
+P_W_est = 120*0.453592/745.7
 W_S_decolagem = aircraft.W_S_decolagem(P_W_est)
 W_S_decolagem_si = W_S_decolagem/0.2048
 print('W/S para decolagem: (kg/m^2)', W_S_decolagem_si)
