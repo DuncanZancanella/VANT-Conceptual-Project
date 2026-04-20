@@ -36,7 +36,7 @@ class Equacionamento():
         self.AR = 14
 
         # --- Aerodynamics
-        self.CLmax = 1.26
+        self.CLmax = 1.63
 
         self.e = 0.9 # wing efficiency
         
@@ -96,15 +96,6 @@ class Equacionamento():
         P_Wto = T_Wto/(self.eta_prop*550/self.V_cruise_fts)
         return T_Wc,T_Wto, P_Wto
     
-    def W_S_cruise(self):
-        q = 0.5*self.rho_kgpm3_2000*(self.V_cruise_mps**2)
-        ws = q*np.sqrt(np.pi*self.e*self.AR*self.CD0)
-        return ws
-    
-    def W_S_cruise_loiter(self):
-        q = 0.5*self.rho_kgpm3_2000*(self.V_cruise_mps**2)
-        wsl = q*np.sqrt(3*np.pi*self.e*self.AR*self.CD0)
-        return wsl
 
     def W_S_vstall(self):
         q = 0.5*self.rho_kgpm3_1000*(self.V_stall_mps**2)
@@ -112,7 +103,7 @@ class Equacionamento():
         return ws_stall
 
     def W_S_decolagem(self,P_W_est):
-        ws = 500*self.rho_kgpm3_2000/self.rho_kgpm3_1000*P_W_est
+        ws = 500*self.rho_kgpm3_2000/self.rho_kgpm3_SL*P_W_est
         return ws
 
     def W_S_pouso(self,S_pouso):
