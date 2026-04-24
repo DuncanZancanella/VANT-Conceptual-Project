@@ -32,7 +32,7 @@ v = Vc_kmh/3.6   ; % Velocidade (m/s)
 T = 275.1            ; % Temperatura do ar (K)
 a_m = sqrt(1.4*T*287)  ;
 M = v/a_m              ;
-vmax = 300/1.863;
+vmax = 300/1.863
 
 
 % -- Estimativa da aeronave:
@@ -41,7 +41,7 @@ LD_max = 18;
 LD_c = LD_max;
 LD_l = 0.866 * LD_max;
 AR = 14;
-P_W = 0.073;
+P_W = 0.067;
 W_S = 14.4;
 C_c_hr = 0.4; %consumo específico cruzeiro
 C_c_s = C_c_hr/3600;
@@ -60,16 +60,16 @@ Wpl = CP_lb;
 Wmotor = 164.2444;
 
 % -- Peso Vazio
-a = -0.25;
-b = 1.18;
-C1 = -0.20;
-C2 = 0.08;
-C3 = 0.05;
+a = 0;
+b = 0.69;
+C1 = -0.10;
+C2 = 0.05;
+C3 = 0.10;
 C4 = -0.05;
-C5 = 0.27;
+C5 = 0.17;
 
 %WeW0 = @(W0) a + b*(W0^C1)* (AR^C2)*(P_W^C3)*(W_S^C4)*(vmax^C5) ;
-We =  1918.4 % valor código missão 2
+We =  1242.5 % valor código missão 2
 % -- Peso Combustível
 
 % W1/W0
