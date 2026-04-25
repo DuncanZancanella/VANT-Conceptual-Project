@@ -17,11 +17,30 @@ km_to_ft = 3280.84           ;
 
 Wdrop = 150 * kg_to_lb
 
+Wmotor = 164.2444 % lb
+
 % Fracao de peso vazio
 A = 1.67  ;
 c = -0.16 ;
 Kvs = 1   ;
+
+cargaAlar = 14.4;
+potenciaPeso = 0.067;
+
+a  = 0;
+b  =  0.69;
+c1 = -0.10;
+c2 =  0.05;
+c3 =  0.1;
+c4 = -0.05;
+c5 =  0.17;
+
+AR = 14;
+Vmax = 161.987;
+
 WeW0 = @(W0) A * W0^c * Kvs;
+
+WeW0 = @(W0) a + b*W0^c1*AR^c2*potenciaPeso^c3*(cargaAlar)^c4*Vmax^c5;
 
 % Warmp up e decolagem
 W1W0 = 0.97
@@ -31,7 +50,7 @@ v = 150/3.6          ; % Velocidade (m/s)
 T = 275.1            ; % Temperatura do ar (K)
 a = sqrt(1.4*T*287)  ;
 M = v/a              ;
-W2W1 = 1.0065 - 0.0325*M
+%W2W1 = 1.0065 - 0.0325*M
 W2W1 = 0.985
 
 % Cruzeiro
@@ -56,7 +75,7 @@ W5 = @(W0) W4(W0) - Wdrop;
 Wf57 = @(W0) 1.06*(1 - W7W6*W6W5)*(W5(W0));
 Wf = @(W0) Wf04(W0) + Wf57(W0);
 
-g = @(W0) W0 - ( Wdrop + WeW0(W0)*W0 + Wf(W0) );
+g = @(W0) W0 - ( Wdrop + WeW0(W0)*W0 + Wf(W0) + Wmotor);
 
 W0 = fzero(g, 1000)
 WfW0 = Wf(W0)/W0
@@ -74,7 +93,7 @@ W6 = W6W5 * W5;
 W7 = W7W6 * W6
 
 x = [0,1,2,3,4,5,6, 7];
-plot(x,[W0,W1,W2,W3,W4_val,W5_val,W6,W7], 'b--o', 'LineWidth', 3)
+plot(x,[W0,W1,W2,W3,W4,W5,W6,W7], 'b--o', 'LineWidth', 3)
 grid('on')
 
 title('Evolução do Peso na Missão 2', 'FontSize', 25)
