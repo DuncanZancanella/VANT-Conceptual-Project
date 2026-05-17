@@ -91,7 +91,7 @@ W6W5 = 0.995
 WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 
 % --- Resolvendo W0
-%R = @(W0) W0 - (Wpl + Wmotor + WfW0*W0 + WeW0(W0)*W0 ) ;
+%R = @(W0) W0 - (Wpl+ WfW0*W0 + WeW0(W0)*W0 ) ;
 R = @(W0) W0 - (Wpl + WfW0*W0 + We) ;
 W0 = fzero(R, 1000)
 
