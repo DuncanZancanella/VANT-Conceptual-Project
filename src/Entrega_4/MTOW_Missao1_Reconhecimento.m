@@ -41,8 +41,8 @@ LD_max = 18;
 LD_c = LD_max;
 LD_l = 0.866 * LD_max;
 AR = 14;
-P_W = 0.067;
-W_S = 14.4;
+P_W = 0.056;
+W_S = 13.878;
 C_c_hr = 0.4; %consumo específico cruzeiro
 C_c_s = C_c_hr/3600;
 
@@ -67,7 +67,7 @@ C4 = -0.05;
 C5 = 0.17;
 
 %WeW0 = @(W0) a + b*(W0^C1)* (AR^C2)*(P_W^C3)*(W_S^C4)*(vmax^C5) ;
-We =  917.70 % valor código missão 2
+We =   873.79 % valor código missão 2
 % -- Peso Combustível
 
 % W1/W0
@@ -93,7 +93,7 @@ WfW0 = 1.06*(1 - W1W0*W2W1*W3W2*W4W3*W5W4*W6W5);
 % --- Resolvendo W0
 %R = @(W0) W0 - (Wpl+ WfW0*W0 + WeW0(W0)*W0 ) ;
 R = @(W0) W0 - (Wpl + WfW0*W0 + We) ;
-W0 = fzero(R, 1000)
+W0 = fzero(R, 200)
 
 Wf = WfW0*W0
 
