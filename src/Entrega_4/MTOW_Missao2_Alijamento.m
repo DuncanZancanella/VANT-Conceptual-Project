@@ -22,8 +22,8 @@ A = 1.67  ;
 c = -0.16 ;
 Kvs = 1   ;
 
-cargaAlar = 14.4;
-potenciaPeso = 0.067;
+cargaAlar = 13.878;
+potenciaPeso = 0.056;
 
 a  = 0;
 b  =  0.69;
