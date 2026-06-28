@@ -26,7 +26,7 @@ class Weights:
         self.l_f = 7.1432*3.281 #ft fuselage length
         self.D_f = 0.9*3.281 #ft fuselage depth
         self.w_f = 0.9*3.281 #ft fuselage width
-        self.W_l = 873.79 #peso no pouso
+        self.W_l = 901.42 #peso no pouso
         N_gear = 2
         self.N_l = 1.5*N_gear #fator carga pouso
         self.L_n = 1.1*3.281 #ft nose landing gear length
@@ -49,7 +49,7 @@ class Weights:
         return W_wing
     
     def ht_weight(self):
-        W_ht = 0.016*((self.Nz * self.design_weight)**0.414)*(self.q**0.168)*(self.S_ht)**0.896*((100*self.t_c/np.cos(self.lamb_ht))**-0.12)*((self.A_vt /((np.cos(self.lamb_ht))**2))** 0.043)*self.lamb_ht**-0.02
+        W_ht = 0.016*((self.Nz * self.design_weight)**0.414)*(self.q**0.168)*(self.S_ht)**0.896*((100*self.t_c/np.cos(self.lamb))**-0.12)*((self.A_w /((np.cos(self.lamb_ht))**2))** 0.043)*self.lamb_ht**-0.02
         return W_ht
     
     def vt_weight(self):
@@ -91,13 +91,9 @@ class Weights:
         W_elec = 12.57*((2.117*self.W_uav**0.933) + (2.49*(self.fuel_vol_total**0.726)*(1/(1+self.Vi_Vt))**0.363*(self.N_t**0.242)*self.N_en**0.157))**0.51
         return W_elec
 
-
-    def furnishing_weight(self):
-        W_furnishing = 0.0582*self.design_weight - 65
-        return W_furnishing
     
 Pesos = Weights()
-total = Pesos.wing_weight() + Pesos.ht_weight() + Pesos.vt_weight() + Pesos.fus_weight() + Pesos.landing_gear_weight() + Pesos.installed_engine_weight() + Pesos.fuel_system_weight() + Pesos.flight_control_weight() + Pesos.hyd_weight()+ Pesos.avionics_weight() + Pesos.elec_weight() + Pesos.furnishing_weight()
+total = Pesos.wing_weight() + Pesos.ht_weight() + Pesos.vt_weight() + Pesos.fus_weight() + Pesos.landing_gear_weight() + Pesos.installed_engine_weight() + Pesos.fuel_system_weight() + Pesos.flight_control_weight() + Pesos.hyd_weight()+ Pesos.avionics_weight() + Pesos.elec_weight() 
 print(f"Total estimated weight: {total:.2f} lb")
 print(f"Wing weight: {Pesos.wing_weight():.2f} lb")
 print(f"Horizontal tail weight: {Pesos.ht_weight():.2f} lb")
@@ -110,7 +106,7 @@ print(f"Flight control weight: {Pesos.flight_control_weight():.2f} lb")
 print(f"Hydraulic system weight: {Pesos.hyd_weight():.2f} lb")
 print(f"Electrical system weight: {Pesos.elec_weight():.2f} lb")
 print(f"Avionics weight: {Pesos.avionics_weight():.2f} lb")
-print(f"Furnishing weight: {Pesos.furnishing_weight():.2f} lb")
+
 
 
 
