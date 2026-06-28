@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+data_pesos = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
+data_pesos['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV']  
+data_pesos['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,3.983,3.983,3.6686,3.6686,1,1]
+
 class Weights:
     def __init__(self):
         self.design_weight = 1475.1 * 0.8 #lb
@@ -91,23 +95,18 @@ class Weights:
         W_elec = 12.57*((2.117*self.W_uav**0.933) + (2.49*(self.fuel_vol_total**0.726)*(1/(1+self.Vi_Vt))**0.363*(self.N_t**0.242)*self.N_en**0.157))**0.51
         return W_elec
 
-    
+ 
 Pesos = Weights()
-total = Pesos.wing_weight() + Pesos.ht_weight() + Pesos.vt_weight() + Pesos.fus_weight() + Pesos.landing_gear_weight() + Pesos.installed_engine_weight() + Pesos.fuel_system_weight() + Pesos.flight_control_weight() + Pesos.hyd_weight()+ Pesos.avionics_weight() + Pesos.elec_weight() 
-print(f"Total estimated weight: {total:.2f} lb")
-print(f"Wing weight: {Pesos.wing_weight():.2f} lb")
-print(f"Horizontal tail weight: {Pesos.ht_weight():.2f} lb")
-print(f"Vertical tail weight: {Pesos.vt_weight():.2f} lb")
-print(f"Fuselage weight: {Pesos.fus_weight():.2f} lb")
-print(f"Landing gear weight: {Pesos.landing_gear_weight():.2f} lb")
-print(f"Installed engine weight: {Pesos.installed_engine_weight():.2f} lb")
-print(f"Fuel system weight: {Pesos.fuel_system_weight():.2f} lb")
-print(f"Flight control weight: {Pesos.flight_control_weight():.2f} lb")
-print(f"Hydraulic system weight: {Pesos.hyd_weight():.2f} lb")
-print(f"Electrical system weight: {Pesos.elec_weight():.2f} lb")
-print(f"Avionics weight: {Pesos.avionics_weight():.2f} lb")
 
+data_pesos['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight()]
 
+print(data_pesos)
+
+Total = data_pesos['Peso (lb)'].sum()
+CG_empty = data_pesos['Peso (lb)'].dot(data_pesos['Posição (m)']) / Total
+
+print(f"Peso total estimado: {Total:.2f} lb")
+print(f"Centro de gravidade estimado: {CG_empty:.2f} m")
 
 
 
