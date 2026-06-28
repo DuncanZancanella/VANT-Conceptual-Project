@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 data_pesos = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
-data_pesos['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV']  
-data_pesos['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,3.983,3.983,3.6686,3.6686,1,1]
+data_pesos['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
+data_pesos['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,3.760,4.4695,4.9555,1.7125,1.101,1.101,3.077,3.6686]
+
 
 class Weights:
     def __init__(self):
@@ -97,17 +98,20 @@ class Weights:
 
  
 Pesos = Weights()
-
-data_pesos['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight()]
+payload_weight = 330.69
+fuel_weight = 293.39
+data_pesos['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight(), payload_weight, fuel_weight]
 
 print(data_pesos)
-
+print(data_pesos['Componente'][:11])
+Total_empty = data_pesos['Peso (lb)'][:11].sum()
 Total = data_pesos['Peso (lb)'].sum()
-CG_empty = data_pesos['Peso (lb)'].dot(data_pesos['Posição (m)']) / Total
-
+CG_empty = data_pesos['Peso (lb)'][:11].dot(data_pesos['Posição (m)'][:11]) / Total_empty
+CG_full = data_pesos['Peso (lb)'].dot(data_pesos['Posição (m)']) / Total
+print(f"Peso vazio estimado: {Total_empty:.2f} lb")
 print(f"Peso total estimado: {Total:.2f} lb")
-print(f"Centro de gravidade estimado: {CG_empty:.2f} m")
-
+print(f"Centro de gravidade vazio estimado: {CG_empty:.2f} m")
+print(f"Centro de gravidade cheio estimado: {CG_full:.2f} m")
 
 
 
