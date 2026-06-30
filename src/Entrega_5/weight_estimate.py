@@ -2,10 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-data_pesos = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
-data_pesos['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
-data_pesos['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,3.760,4.4695,4.9555,1.7125,1.101,1.101,3.077,3.6686]
+data_pesos_1 = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
+data_pesos_1['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
+data_pesos_1['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,5.142,4.52,4.5,1.7125,1.101,1.101,3.077,3.6686]
 
+data_pesos_2 = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
+data_pesos_2['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
+data_pesos_2['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,5.142,4.52,4.5,1.7125,1.101,1.101,3.077,3.6686]
 
 class Weights:
     def __init__(self):
@@ -98,21 +101,35 @@ class Weights:
 
  
 Pesos = Weights()
-payload_weight = 330.69
-fuel_weight = 293.39
-data_pesos['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight(), payload_weight, fuel_weight]
 
-print(data_pesos)
-print(data_pesos['Componente'][:11])
-Total_empty = data_pesos['Peso (lb)'][:11].sum()
-Total = data_pesos['Peso (lb)'].sum()
-CG_empty = data_pesos['Peso (lb)'][:11].dot(data_pesos['Posição (m)'][:11]) / Total_empty
-CG_full = data_pesos['Peso (lb)'].dot(data_pesos['Posição (m)']) / Total
+payload_weight_1 = 11.02
+payload_weight_2 = 330.69
+fuel_weight_1 = 293.39
+fuel_weight_2 = 270.61
+
+data_pesos_1['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight(), payload_weight_1, fuel_weight_1]
+data_pesos_2['Peso (lb)'] = [Pesos.wing_weight(), Pesos.ht_weight(), Pesos.vt_weight(), Pesos.fus_weight(), Pesos.landing_gear_weight(), Pesos.installed_engine_weight(), Pesos.fuel_system_weight(), Pesos.flight_control_weight(), Pesos.hyd_weight(), Pesos.elec_weight(), Pesos.avionics_weight(), payload_weight_2, fuel_weight_2]
+
+
+Total_empty = data_pesos_1['Peso (lb)'][:11].sum()
+Total_1 = data_pesos_1['Peso (lb)'].sum()
+Total_2 = data_pesos_2['Peso (lb)'].sum()
+
+CG_empty = data_pesos_1['Peso (lb)'][:11].dot(data_pesos_1['Posição (m)'][:11]) / Total_empty
+
+CG_full_1 = data_pesos_1['Peso (lb)'].dot(data_pesos_1['Posição (m)']) / Total_1
+
+CG_full_2 = data_pesos_2['Peso (lb)'].dot(data_pesos_2['Posição (m)']) / Total_2
+
+
 print(f"Peso vazio estimado: {Total_empty:.2f} lb")
-print(f"Peso total estimado: {Total:.2f} lb")
-print(f"Centro de gravidade vazio estimado: {CG_empty:.2f} m")
-print(f"Centro de gravidade cheio estimado: {CG_full:.2f} m")
 
+print(f"Peso total 1 estimado: {Total_1:.2f} lb")
+print(f"Peso total 2 estimado: {Total_2:.2f} lb")
+
+print(f"Centro de gravidade vazio estimado: {CG_empty:.2f} m")
+print(f"Centro de gravidade cheio 1 estimado: {CG_full_1:.2f} m")
+print(f"Centro de gravidade cheio 2 estimado: {CG_full_2:.2f} m")
 
 
 
