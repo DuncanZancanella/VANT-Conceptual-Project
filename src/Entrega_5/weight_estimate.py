@@ -4,7 +4,7 @@ import pandas as pd
 
 data_pesos_1 = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
 data_pesos_1['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
-data_pesos_1['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,5.142,4.52,4.5,1.7125,1.101,1.101,3.077,3.6686]
+data_pesos_1['Posição (m)'] = [3.6686,6.02392,6.02392,2.85728,2.897,5.142,4.52,4.5,1.7125,1.101,1.101,0.585,3.6686]
 
 data_pesos_2 = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
 data_pesos_2['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']  
@@ -122,15 +122,25 @@ CG_full_1 = data_pesos_1['Peso (lb)'].dot(data_pesos_1['Posição (m)']) / Total
 CG_full_2 = data_pesos_2['Peso (lb)'].dot(data_pesos_2['Posição (m)']) / Total_2
 
 
-print(f"Peso vazio estimado: {Total_empty:.2f} lb")
+data_pesos_ali = pd.DataFrame(columns=['Componente', 'Peso (lb)', 'Posição (m)'])
+data_pesos_ali['Componente'] = ['Asa', 'EH', 'EV', 'Fus', 'LG', 'I. EN.', 'Fuel S', 'FC', 'HYD', 'ELEC', 'AV','CP','Fuel']
+data_pesos_ali['Peso (lb)'] = data_pesos_1['Peso (lb)'].copy()
+data_pesos_ali['Posição (m)'] = data_pesos_1['Posição (m)'].copy()
 
+data_pesos_ali.loc[data_pesos_ali['Componente'] == 'Fuel', 'Peso (lb)'] = 87.59
+data_pesos_ali.loc[data_pesos_ali['Componente'] == 'CP', 'Peso (lb)'] = 0
+
+CG_alij = data_pesos_ali['Peso (lb)'].dot(data_pesos_ali['Posição (m)']) / data_pesos_ali['Peso (lb)'].sum()
+
+Total_ali = data_pesos_ali['Peso (lb)'].sum()
+
+
+print(f"Peso vazio estimado: {Total_empty:.2f} lb")
 print(f"Peso total 1 estimado: {Total_1:.2f} lb")
 print(f"Peso total 2 estimado: {Total_2:.2f} lb")
+print(f"Peso total após alijamento estimado: {Total_ali:.2f} lb")
 
 print(f"Centro de gravidade vazio estimado: {CG_empty:.2f} m")
 print(f"Centro de gravidade cheio 1 estimado: {CG_full_1:.2f} m")
 print(f"Centro de gravidade cheio 2 estimado: {CG_full_2:.2f} m")
-
-
-
-
+print(f"Centro de gravidade após alijamento estimado: {CG_alij:.2f} m")
