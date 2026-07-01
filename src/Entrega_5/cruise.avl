@@ -1,0 +1,73 @@
+MinhaAsa
+
+0               ! Mach
+0 0 0           ! iYsym  iZsym  Zsym
+9.86 0.82 11.75 ! Sref   Cref   Bref
+3.5  0.0  0.0   ! Xref   Yref   Zref
+
+SURFACE
+Wing
+20 1 24 -2.0  ! Nchord  Cspace   [ Nspan Sspace ]
+
+YDUPLICATE
+0.0
+
+ANGLE
+0.0
+
+SCALE
+1 1 1
+
+SECTION
+3.34 0 0  0.967 0 ! Xle Yle Zle   Chord Ainc
+
+AFILE
+clarky.dat
+
+SECTION
+3.485 5.882 0.308  0.677  0.0
+
+AFILE
+clarky.dat
+
+SECTION
+3.624 6.032 0.568  0.400  0.0
+
+AFILE
+clarky.dat
+
+
+
+
+SURFACE
+VTAIL
+20 1 24 -2.0  ! Nchord  Cspace   [ Nspan Sspace ]
+
+YDUPLICATE
+0.0
+
+ANGLE
+0.0
+
+SCALE
+1 1 1
+
+SECTION
+5.79 0 0  0.82 0 ! Xle Yle Zle   Chord Ainc
+
+NACA
+0010
+
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+CONTROL
+Elevator 1.0    0.5    0.0 0.807 0.590    1.0
+
+SECTION
+6.035 1.538 1.124  0.33 0 ! Xle Yle Zle   Chord Ainc
+
+NACA
+0010
+
+#Cname   Cgain  Xhinge  HingeVec       SgnDup
+CONTROL
+Elevator 1.0    0.5    0.0 0.807 0.590    1.0
